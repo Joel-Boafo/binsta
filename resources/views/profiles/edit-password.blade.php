@@ -17,31 +17,16 @@
                         <input class="w-full border border-black px-4 py-2 rounded-lg outline-none" type="password"
                             name="current_password" id="current_password"
                             placeholder="Current Password{{ $user->password_changed_at ? ' (Last updated ' . $user->password_changed_at . ')' : '' }}">
-                        @if ($errors->has('current_password'))
-                        <span class="text-red-600 text-sm" role="alert">
-                            <strong>{{ $errors->first('current_password') }}</strong>
-                        </span>
-                        @endif
                     </div>
                     <label class="font-bold text-lg ml-48 mt-3" for="New Password">New Password</label>
                     <div class="w-8/12 mx-auto h-auto px-4 py-3 bg-white rounded-xl">
                         <input class="w-full border border-black px-4 py-2 rounded-lg outline-none" type="password"
                             name="password" id="password" placeholder="New Password">
-                        @if ($errors->has('password'))
-                        <span class="text-red-600 text-sm" role="alert">
-                            <strong>{{ $errors->first('password') }}</strong>
-                        </span>
-                        @endif
                     </div>
                     <label class="font-bold text-lg ml-48 mt-3" for="Confirm Password">Confirm Password</label>
                     <div class="w-8/12 mx-auto h-auto px-4 py-3 bg-white rounded-xl">
                         <input class="w-full border border-black px-4 py-2 rounded-lg outline-none" type="password"
                             name="confirm_password" id="confirm_password" placeholder="Confirm New Password">
-                        @if ($errors->has('confirm_password'))
-                        <span class="text-red-600 text-sm" role="alert">
-                            <strong>{{ $errors->first('confirm_password') }}</strong>
-                        </span>
-                        @endif
                     </div>
 
                     <div class="w-8/12 mx-auto h-auto px-4 py-3 bg-white rounded-xl">
@@ -53,7 +38,7 @@
                     <div id="mainModal" class="relative z-10 hidden" aria-labelledby="modal-title" role="dialog"
                         aria-modal="true">
                         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity">
-                            
+
                         </div>
 
                         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -91,26 +76,26 @@
                                         <button type="button" id="cancel"
                                             class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel
                                         </button>
-                                    </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
-    <script>
-        const changePassword = document.getElementById('change-password');
-        const cancel = document.getElementById('cancel');
-        const mainModal = document.getElementById('mainModal');
-
-        changePassword.addEventListener('click', function () {
-            mainModal.classList.remove('hidden');
-        });
-
-        cancel.addEventListener('click', function () {
-            mainModal.classList.add('hidden');
-        });
-    </script>
 </x-app-layout>
+<script>
+    const changePassword = document.getElementById('change-password');
+    const cancel = document.getElementById('cancel');
+    const mainModal = document.getElementById('mainModal');
+
+    changePassword.addEventListener('click', function () {
+        mainModal.classList.remove('hidden');
+    });
+
+    cancel.addEventListener('click', function () {
+        mainModal.classList.add('hidden');
+    });
+</script>

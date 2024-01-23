@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -71,10 +72,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/posts/like', [PostController::class, 'likePost'])
         ->name('posts.like');
 
-    Route::post('/posts/comment', [PostController::class, 'placeComment'])
+    Route::post('/posts/comment', [CommentController::class, 'placeComment'])
         ->name('posts.comment');
 
-    Route::delete('/posts/comment/delete/{comment}', [PostController::class, 'deleteComment'])
+    Route::delete('/posts/comment/delete/{comment}', [CommentController::class, 'deleteComment'])
         ->name('posts.comment.delete');
 
     Route::delete('/posts/delete/{post}', [PostController::class, 'deletePost'])

@@ -3,7 +3,8 @@
         <header>
             <nav class="flex justify-between items-center w-full">
                 <div>
-                    <img id="logo" class="h-12 md:h-20" src="{{ asset('Logo-Instagram.png') }}" alt="Binsta logo">
+                    <a href="{{ route('home') }}"><img id="logo" class="h-12 md:h-20"
+                            src="{{ asset('Logo-Instagram.png') }}" alt="Binsta logo"></a>
                 </div>
 
                 <div class="flex items-center md:hidden">

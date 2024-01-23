@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PasswordRequest;
+use App\Http\Requests\ProfilePictureRequest;
+use App\Http\Requests\ProfileRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -32,20 +35,9 @@ class ProfileController extends Controller
         return view('profiles.edit', compact('user'));
     }
 
-    public function update(Request $request)
+    public function update(ProfileRequest $request)
     {
-        $request->validate(
-            [
-                'name' => 'required|string|max:255' . auth()->user()->id,
-                'username' => 'required|string|max:255|regex:/^[a-zA-Z0-9_-]+$/u|unique:users,username,' . auth()->user()->id,
-                'email' => 'required|string|email|max:255|unique:users,email,' . auth()->user()->id,
-                'bio' => 'nullable|string|max:255',
-                'customGender' => 'nullable|string|max:40'
-            ],
-            [
-                'username.regex' => 'Username can only contain letters, numbers, dashes and underscores',
-            ]
-        );
+        $request->validated();
 
         $user = User::find(auth()->user()->id);
 
@@ -60,11 +52,9 @@ class ProfileController extends Controller
         return redirect()->route('profiles.edit')->with('status', 'Profile updated successfully');
     }
 
-    public function updateProfilePicture(Request $request)
+    public function updateProfilePicture(ProfilePictureRequest $request)
     {
-        $request->validate([
-            'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
+        $request->validated('avatar');
 
         $user = User::find(auth()->user()->id);
 
@@ -91,18 +81,9 @@ class ProfileController extends Controller
         return view('profiles.edit-password', compact('user'));
     }
 
-    public function updatePassword(Request $request)
+    public function updatePassword(PasswordRequest $request)
     {
-        $request->validate(
-            [
-                'current_password' => 'required',
-                'password' => 'required',
-                'confirm_password' => 'required|same:password',
-            ],
-            [
-                'confirm_password.same' => 'Passwords do not match',
-            ]
-        );
+        $request->validated();
 
         $user = User::find(auth()->user()->id);
 
@@ -126,12 +107,12 @@ class ProfileController extends Controller
     }
 
     public function search(Request $request)
-{
-    $query = $request->query->get('query');
-    $users = User::where('username', 'LIKE', "%{$query}%")
-        ->orWhere('name', 'LIKE', "%{$query}%")
-        ->get();
-    
-    return response()->json($users);
-}
+    {
+        $query = $request->query->get('query');
+        $users = User::where('username', 'LIKE', "%{$query}%")
+            ->orWhere('name', 'LIKE', "%{$query}%")
+            ->get();
+
+        return response()->json($users);
+    }
 }
