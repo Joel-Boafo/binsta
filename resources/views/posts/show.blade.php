@@ -95,7 +95,6 @@
     </script>
 
     <style>
-        /* Hide scrollbar for Chrome, Safari and Opera */
         .overflow-y-auto::-webkit-scrollbar {
             display: none;
         }

@@ -2,7 +2,7 @@
     <x-status></x-status>
     <div class="text-center font-sans">
         <div class="inline-block border-2 border-slate-300 w-[51%] mt-12">
-            <img src="../Logo-Instagram.png" alt="instagram logo" class="h-24 relative left-[37%]">
+            <x-binsta-logo />
             <span class="font-semibold">Sign up to see code snippets from your friends!</span>
             <form method="POST" action="{{ route('users.register.post') }}">
                 @csrf

@@ -53,36 +53,4 @@
             @endif
         </form>
     </div>
-
-    <script>
-        // Function to update code output based on selected options
-        function updateCodeOutput() {
-            var codeInput = document.getElementById('codeInput').value;
-            var codeOutput = document.getElementById('codeOutput');
-            
-            // Get the selected language from the dropdown
-            var selectedLanguage = document.getElementById('languageSelect').value;
-            
-            // Get the selected highlight option from the dropdown
-            var highlightOption = document.getElementById('highlightOption').value;
-    
-            // Use Prism.js to highlight the code based on the selected option
-            if (highlightOption === 'all') {
-                codeOutput.innerHTML = '<pre><code class="language-' + selectedLanguage + '">' + Prism.highlight(codeInput, Prism.languages[selectedLanguage], selectedLanguage) + '</code></pre>';
-            } else {
-                codeOutput.innerHTML = '<pre><code class="language-' + selectedLanguage + '">' + codeInput + '</code></pre>';
-            }
-            
-            // Manually re-highlight to apply changes
-            Prism.highlightAll();
-        }
-
-        // Add event listeners to the dropdowns
-        document.getElementById('languageSelect').addEventListener('change', updateCodeOutput);
-        document.getElementById('highlightOption').addEventListener('change', updateCodeOutput);
-        document.getElementById('codeInput').addEventListener('input', updateCodeOutput);
-
-        // Initial call to update the code output
-        updateCodeOutput();
-    </script>
 </x-app-layout>

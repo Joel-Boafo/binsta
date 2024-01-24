@@ -19,7 +19,6 @@
                                 alt="avatar">
                             <h3 class="font-bold text-sm ml-3">{{ $user->username }}</h3>
                         </div>
-                        {{-- <input type="file" name="avatar"> --}}
                         <label for="upload">
                             <span class="bg-blue-500 rounded-lg px-1.5 py-2 text-white font-semibold text-sm" aria-hidden="true">Change
                                 Profile Picture</span>
@@ -180,13 +179,11 @@
             }
         }
     
-        // Toggle the options dropdown
         document.getElementById("customDropdown").addEventListener("click", function () {
             var options = document.getElementById("options");
             options.classList.toggle("hidden");
         });
     
-        // Close the options dropdown when clicking outside
     document.addEventListener("click", function (event) {
         var options = document.getElementById("options");
         if (!event.target.closest("#customDropdown") && !event.target.closest("#options") && !event.target.closest("#customInput")) {

@@ -42,23 +42,23 @@
                 @endif
             </div>
 
-            <!-- Display the code with Prism.js highlighting -->
-            <pre
-                class="max-h-48 overflow-x-auto overflow-y-auto hide-scrollbar"><code class="language-{{ $post->programming_language }}">{{ $post->code }}</code></pre>
+            <pre class="max-h-48 overflow-x-auto overflow-y-auto hide-scrollbar">
+                <code class="language-{{ $post->programming_language }}">{{ $post->code }}</code>
+            </pre>
 
             <div class="flex justify-between">
                 <form action="{{ route('posts.like', $post->id) }}" method="POST">
                     @csrf
                     <div class="flex">
                         <input type="hidden" name="post_id" id="" value="{{ $post->id }}">
-                        <button id="likeButton" class="outline-none"><svg id="likeSVG"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="w-6 h-6 ml-4">
+                        <button id="likeButton" class="outline-none">
+                            <svg id="likeSVG" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" class="w-6 h-6 ml-4">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                            </svg></button>
-                        <p class="font-semibold ml-3">{{ $post->likes->count() }} {{ $post->likes->count() == 1 ? 'like'
-                            : 'likes' }}</p>
+                            </svg>
+                        </button>
+                        <p class="font-semibold ml-3">{{ $post->likes->count() }} {{ $post->likes->count() == 1 ? 'like' : 'likes' }}</p>
                     </div>
                 </form>
             </div>
@@ -69,9 +69,9 @@
             </div>
 
             <div>
-                <button class="outline-none text-blue-500 ml-4 font-semibold"><a
-                        href="{{ route('posts.show', $post->id) }}">View all {{ $post->comments->count() }}
-                        comments</a></button>
+                <button class="outline-none text-blue-500 ml-4 font-semibold">
+                    <a href="{{ route('posts.show', $post->id) }}">View all {{ $post->comments->count() }} comments</a>
+                </button>
             </div>
 
             @if($post->comments->count() > 0)
@@ -99,13 +99,11 @@
             @push('scripts')
             <script>
                 document.addEventListener('DOMContentLoaded', (event) => {
-                            document.getElementById('likeButton').addEventListener('click', () => {
-                                    document.getElementById('likeSVG').setAttribute('stroke', 'red');
-                            });
-                        });
-                // Use Prism.js to highlight the code
-                    Prism.highlightAll();
-
+                    document.getElementById('likeButton').addEventListener('click', () => {
+                        document.getElementById('likeSVG').setAttribute('stroke', 'red');
+                    });
+                });
+                Prism.highlightAll();
             </script>
             @endpush
         </div>
