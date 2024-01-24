@@ -24,7 +24,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'username' => fake()->userName(),
+            'username' => fake()->regexify('[A-Za-z0-9_-]{5,15}'),
             'email' => fake()->unique()->safeEmail(),
             'bio' => fake()->sentence(),
             'avatar' => fake()->image('public/storage/avatars', 640, 480, null, false),
