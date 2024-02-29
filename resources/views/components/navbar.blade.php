@@ -1,10 +1,10 @@
 <div class="bg-gray-200">
-    <div class="navbar nav bg-white w-full rounded-sm items-center p-1">
+    <div class="navbar nav bg-white w-full rounded-sm items-center p-2">
         <header>
             <nav class="flex justify-between items-center w-full">
                 <div>
                     <a href="{{ route('home') }}">
-                        <x-binsta-logo />   
+                        <x-binsta-logo />
                     </a>
                 </div>
 
@@ -107,7 +107,7 @@
                                         ${user.username}
                                     </div>
                                     <div class="text-gray-500 text-sm text-gray-800 hover:bg-gray-200">
-                                        ${user.name}
+                                        ${user.name ? user.name : ''}
                                     </div>
                                 </div>
                             </a>

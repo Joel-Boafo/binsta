@@ -58,7 +58,8 @@
                                     d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                             </svg>
                         </button>
-                        <p class="font-semibold ml-3">{{ $post->likes->count() }} {{ $post->likes->count() == 1 ? 'like' : 'likes' }}</p>
+                        <p class="font-semibold ml-3">{{ $post->likes->count() }} {{ $post->likes->count() == 1 ? 'like'
+                            : 'likes' }}</p>
                     </div>
                 </form>
             </div>
@@ -99,10 +100,24 @@
             @push('scripts')
             <script>
                 document.addEventListener('DOMContentLoaded', (event) => {
-                    document.getElementById('likeButton').addEventListener('click', () => {
-                        document.getElementById('likeSVG').setAttribute('stroke', 'red');
-                    });
-                });
+                    const likeButton = document.getElementById('likeButton');
+                    const likeSVG = document.getElementById('likeSVG');
+
+                    let isLiked = false;
+
+                    likeButton.addEventListener('click', () => {
+                        // Toggle the 'liked' class or update the 'stroke' attribute directly
+                        if (!isLiked) {
+                            likeSVG.classList.add('liked');
+                            // Alternatively, you can use: likeSVG.setAttribute('stroke', 'red');
+                        } else {
+                            likeSVG.classList.remove('liked');
+                            // Alternatively, you can use: likeSVG.setAttribute('stroke', 'currentColor');
+                        }
+
+                        isLiked = !isLiked; // Toggle the like state
+            });
+        });
                 Prism.highlightAll();
             </script>
             @endpush
@@ -113,6 +128,10 @@
     <style>
         .overflow-y-auto::-webkit-scrollbar {
             display: none;
+        }
+
+        .liked {
+            stroke: red;
         }
     </style>
 </x-app-layout>

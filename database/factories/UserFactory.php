@@ -24,10 +24,11 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'username' => fake()->regexify('[A-Za-z0-9_-]{5,15}'),
-            'email' => fake()->unique()->safeEmail(),
-            'bio' => fake()->sentence(),
-            'avatar' => fake()->image('public/storage/avatars', 640, 480, null, false),
+            'username' => $this->faker->regexify('[A-Za-z0-9_-]{5,15}'),
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'bio' => $this->faker->sentence(),
+            'avatar' => $this->faker->image('public/storage/avatars', 640, 480, null, false),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),

@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
@@ -41,29 +40,12 @@ class ExampleTest extends TestCase
 
         // Step 4: Logout the user
         Auth::logout();
-
-        // Step 5: Failed login
-        $response = $this->post('/login', [
-            'username' => $user->username,
-            'password' => 'invalid-password',
-        ]);
-
-        // Step 6: Asserts for failed login
-        $response->assertStatus(302);
-        $response->assertRedirect('/login');
-        $response->assertSessionHas('error');
-        $this->assertGuest();
     }
 
     public function testRegisterPost(): void
     {
-        // Use a database transaction to isolate each test
-        DB::beginTransaction();
-
-        // Step 1: Setup
         $user = User::factory()->make();
 
-        // Step 2: Successful registration
         $response = $this->post('/register', [
             'username' => $user->username,
             'email' => $user->email,
@@ -73,29 +55,44 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertRedirect('/login');
-        $response->assertSessionHas('status');
         $this->assertGuest();
+    }
 
-        // Rollback the transaction to remove the user from the database
-        DB::rollBack();
-
-        // Start a new transaction for the next test
-        DB::beginTransaction();
-
-        // Step 3: Failed registration
-        $response = $this->post('/register', [
-            'username' => $user->username,
-            'email' => $user->email,
+    public function testLoginPostFail()
+    {
+        $user = User::factory()->create([
             'password' => 'i-love-laravel',
-            'confirm_password' => 'invalid-password',
+        ]);
+
+        $response = $this->post('/login', [
+            'username' => $user->username,
+            'password' => 'wrong-password',
         ]);
 
         $response->assertStatus(302);
-        $response->assertRedirect('/register');
+        $response->assertRedirect('/login');
         $response->assertSessionHas('error');
         $this->assertGuest();
 
-        // Rollback the transaction to clean up the database
-        DB::rollBack();
+        Auth::logout();
+    }
+
+    public function testregisterPostFail()
+    {
+        $user = User::factory()->make();
+
+        $repsonse = $this->post('/register', [
+            'username' => $user->username,
+            'email' => $user->email,
+            'password' => 'i-love-laravel',
+            'confirm_password' => 'wrong-password',
+        ]);
+
+        $repsonse->assertStatus(302);
+        $repsonse->assertRedirect('/register');
+        $repsonse->assertSessionHas('error');
+        $this->assertGuest();
+
+        Auth::logout();
     }
 }

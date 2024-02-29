@@ -16,7 +16,7 @@ class ProfileController extends Controller
         $user = User::where('username', $username)->first();
 
         if (!$user) {
-            return redirect()->back()->with('error', 'User not found');
+            abort(404, 'User not found');
         }
 
         $posts = User::find($user->id)->posts()->orderBy('created_at', 'desc')->get();
