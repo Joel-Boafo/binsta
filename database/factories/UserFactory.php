@@ -24,7 +24,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'username' => $this->faker->regexify('[A-Za-z0-9_-]{5,15}'),
+            'username' => $this->faker->userName(),
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'bio' => $this->faker->sentence(),

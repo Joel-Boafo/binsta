@@ -100,7 +100,7 @@ class PostController extends Controller
         return redirect()->back()->with('error', 'Post not found');
     }
 
-    public function deletePost(PostRequest $request, Post $post)
+    public function deletePost(Request $request, Post $post)
     {
         $post = Post::find($request->post_id);
 

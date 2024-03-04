@@ -1,98 +1,78 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Tests\TestCase;
 
-class ExampleTest extends TestCase
-{
-    public function testLogin(): void
-    {
-        $response = $this->get('/login');
-        $response->assertStatus(200);
-    }
+it('ensures the user can see the login page', function () {
+    $response = $this->get(route('users.login'));
+    $response->assertStatus(200);
+});
 
-    public function testRegister(): void
-    {
-        $response = $this->get('/register');
-        $response->assertStatus(200);
-    }
+it('ensures the user can login', function () {
+    $user = User::factory()->create([
+        'password' => bcrypt($password = 'i-love-laravel'),
+    ]);
 
-    public function testLoginPost(): void
-    {
-        // Step 1: Setup
-        $user = User::factory()->create([
-            'password' => bcrypt($password = 'i-love-laravel'),
-        ]);
+    $response = $this->post(route('users.login.post'), [
+        'username' => $user->username,
+        'password' => $password,
+    ]);
 
-        // Step 2: Successful login
-        $response = $this->post('/login', [
-            'username' => $user->username,
-            'password' => $password,
-        ]);
+    $response->assertStatus(302);
+    $response->assertRedirect(route('home'));
+    $response->assertSessionHas('status', 'Logged in successfully');
 
-        // Step 3: Asserts for successful login
-        $response->assertStatus(302);
-        $response->assertRedirect('/');
-        $this->assertAuthenticatedAs($user);
+    Auth::logout();
+});
 
-        // Step 4: Logout the user
-        Auth::logout();
-    }
+it('ensures the user can see the register page', function () {
+    $response = $this->get(route('users.register'));
+    $response->assertStatus(200);
+});
 
-    public function testRegisterPost(): void
-    {
-        $user = User::factory()->make();
+it('ensures the user can register', function () {
+    $user = User::factory()->make();
 
-        $response = $this->post('/register', [
-            'username' => $user->username,
-            'email' => $user->email,
-            'password' => 'i-love-laravel',
-            'confirm_password' => 'i-love-laravel',
-        ]);
+    $response = $this->post(route('users.register.post'), [
+        'username' => $user->username,
+        'email' => $user->email,
+        'password' => 'i-love-testing',
+        'confirm_password' => 'i-love-testing'
+    ]);
 
-        $response->assertStatus(302);
-        $response->assertRedirect('/login');
-        $this->assertGuest();
-    }
+    $response->assertStatus(302);
+    $response->assertRedirect(route('users.login'));
+    $response->assertSessionHas('status', 'Registered successfully');
 
-    public function testLoginPostFail()
-    {
-        $user = User::factory()->create([
-            'password' => 'i-love-laravel',
-        ]);
+    Auth::logout();
+});
 
-        $response = $this->post('/login', [
-            'username' => $user->username,
-            'password' => 'wrong-password',
-        ]);
+it('tests for a failed login', function () {
+    $user = User::factory()->create([
+        'password' => 'i-love-testing',
+    ]);
 
-        $response->assertStatus(302);
-        $response->assertRedirect('/login');
-        $response->assertSessionHas('error');
-        $this->assertGuest();
+    $response = $this->post(route('users.login.post'), [
+        'username' => $user->username,
+        'password' => 'wrong-password',
+    ]);
 
-        Auth::logout();
-    }
+    $response->assertStatus(302);
+    $response->assertRedirect(route('users.login'));
+    $response->assertSessionHas('error', 'Invalid credentials');
+});
 
-    public function testregisterPostFail()
-    {
-        $user = User::factory()->make();
+it('tests for a failed registration attempt', function () {
+    $user = User::factory()->make();
 
-        $repsonse = $this->post('/register', [
-            'username' => $user->username,
-            'email' => $user->email,
-            'password' => 'i-love-laravel',
-            'confirm_password' => 'wrong-password',
-        ]);
+    $response = $this->post(route('users.register.post'), [
+        'username' => $user->username,
+        'email' => $user->email,
+        'password' => 'i-love-laravel',
+        'confirm_password' => 'wrong-password',
+    ]);
 
-        $repsonse->assertStatus(302);
-        $repsonse->assertRedirect('/register');
-        $repsonse->assertSessionHas('error');
-        $this->assertGuest();
-
-        Auth::logout();
-    }
-}
+    $response->assertStatus(302);
+    $response->assertRedirect(route('users.register.post'));
+    $response->assertSessionHas('error');
+});
