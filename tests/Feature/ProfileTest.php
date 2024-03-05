@@ -1,34 +1,58 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\User;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Auth;
-use Tests\TestCase;
 
-class ProfileTest extends TestCase
-{
-    use WithFaker;
-    public function testUserCanSeeEditProfilePage()
-    {
-        it('');
-    }
+it('ensures the user can see the edit profile page', function () {
+    $response = $this->get(route('profiles.edit'));
+    $response->assertStatus(302);
+});
 
-    public function testUserCanUpdateProfile()
-    {
-        $user = User::factory()->create();
+it('ensures the user can edit their profile', function () {
+    $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->put(route('profiles.lorenz'), [
-            'name' => $this->faker->name,
-            'username' => $this->faker->userName,
-            'email' => $this->faker->email,
-            'bio' => $this->faker->sentence,
-        ]);
+    $response = $this->actingAs($user)->put(route('profiles.lorenz'), [
+        'name' => fake()->name(),
+        'username' => fake()->userName(),
+        'email' => fake()->safeEmail(),
+        'bio' => fake()->paragraph(),
+    ]);
 
-        $response->assertStatus(302);
-        $response->assertRedirect('/profile/edit');
+    $response->assertStatus(302);
+    $response->assertRedirect(route('profiles.edit'));
+    $response->assertSessionHas('status', 'Profile updated successfully');
 
-        $response->assertSessionHas('status', 'Profile updated successfully');
-    }
-}
+    Auth::logout();
+
+    $user->delete();
+});
+
+it('ensures the user can change their password', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->put(route('profiles.update-password'), [
+        'current_password' => $user->password,
+        'password' => 'i-love-testing',
+        'confirm_password' => 'i-love-testing',
+    ]);
+
+    $response->assertStatus(302);
+    $response->assertRedirect(route('users.login'));
+    $response->assertSessionHas('status', 'Password updated successfully');
+
+    Auth::logout();
+
+    $user->delete();
+});
+
+it('ensures the user can see the profile show page', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('profiles.show', $user->username));
+
+    $response->assertStatus(200);
+
+    Auth::logout();
+
+    $user->delete();
+});

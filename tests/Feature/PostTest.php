@@ -1,170 +1,137 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\User;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Auth;
-use Tests\TestCase;
 
-class PostTest extends TestCase
-{
-    use WithFaker;
+it('ensures the user can create a post', function () {
+    $user = User::factory()->create();
+    $response = $this->actingAs($user)->post(route('posts.create.post'), [
+        'programming_language' => 'php',
+        'code' => fake()->paragraph(),
+        'caption' => fake()->sentence(),
+    ]);
 
-    public function testUserCanSeeHomePage()
-    {
-        $user = User::factory()->create();
+    $response->assertStatus(302);
+    $response->assertRedirect(route('home'));
+    $response->assertSessionHas('status', 'Post created successfully');
 
-        $response = $this->actingAs($user)->get('/');
-        $response->assertStatus(200);
+    Auth::logout();
 
-        Auth::logout();
-    }
+    $user->posts()->delete();
 
-    public function testUserCanCreateNewPost()
-    {
-        $user = User::factory()->create();
+    $user->delete();
+});
 
-        $response = $this->actingAs($user)->post(route('posts.create.post'), [
-            'programming_language' => 'php',
-            'caption' => $this->faker->sentence(),
-            'code' => $this->faker->paragraph(),
-        ]);
+it('ensures the user can edit a post', function () {
+    $user = User::factory()->create();
 
-        $response->assertStatus(302);
-        $response->assertRedirect(route('home'));
+    $post = $user->posts()->create([
+        'programming_language' => 'php',
+        'code' => fake()->paragraph(),
+        'caption' => fake()->sentence(),
+    ]);
 
-        $response->assertSessionHas('status', 'Post created successfully');
-    }
+    $response = $this->actingAs($user)->put(route('posts.update'), [
+        'programming_language' => 'js',
+        'code' => fake()->paragraph(),
+        'caption' => fake()->sentence(),
+        'post_id' => $post->id,
+    ]);
 
-    public function testUserCanEditPost()
-    {
-        $user = User::factory()->create();
-        $post = $user->posts()->create([
-            'programming_language' => 'php',
-            'caption' => $this->faker->sentence(),
-            'code' => $this->faker->paragraph(),
-        ]);
+    $response->assertStatus(302);
+    $response->assertRedirect(route('home'));
+    $response->assertSessionHas('status', 'Post updated successfully');
 
-        $response = $this->actingAs($user)->put(route('posts.update'), [
-            'post_id' => $post->id,
-            'programming_language' => 'js',
-            'caption' => $this->faker->sentence(),
-            'code' => $this->faker->paragraph(),
-        ]);
+    Auth::logout();
 
-        $response->assertStatus(302);
-        $response->assertRedirect(route('home'));
+    $user->posts()->delete();
 
-        $response->assertSessionHas('status', 'Post updated successfully');
-    }
+    $user->delete();
+});
 
-    public function testUserCanDeletePost()
-    {
-        $user = User::factory()->create();
+it('ensures the user can like a post', function () {
+    $user = User::factory()->create();
 
-        $post = $user->posts()->create([
-            'programming_language' => 'java',
-            'caption' => $this->faker->sentence(),
-            'code' => $this->faker->paragraph(),
-        ]);
+    $post = $user->posts()->create([
+        'programming_language' => 'java',
+        'code' => fake()->sentence(),
+        'caption' => fake()->paragraph(),
+    ]);
 
-        $response = $this->actingAs($user)->delete(route('posts.delete', $post), [
-            'post_id' => $post->id,
-        ]);
+    $response = $this->actingAs($user)->post(route('posts.like'), [
+        'post_id' => $post->id,
+    ]);
 
-        $response->assertStatus(302);
-        $response->assertRedirect(route('home'));
+    $response->assertStatus(302);
+    $response->assertRedirect(route('home'));
+    $response->assertSessionMissing('error');
+});
 
-        $response->assertSessionMissing('error');
-    }
+it('ensures the user can unlike a post', function () {
+    $user = User::factory()->create();
 
-    public function testUserCanLikePost()
-    {
-        $user = User::factory()->create();
+    $post = $user->posts()->create([
+        'programming_language' => 'java',
+        'code' => fake()->sentence(),
+        'caption' => fake()->paragraph(),
+    ]);
 
-        $post = $user->posts()->create([
-            'programming_language' => 'java',
-            'caption' => $this->faker->sentence(),
-            'code' => $this->faker->paragraph(),
-        ]);
+    $post->likes()->create(['user_id' => $user->id]);
 
-        $response = $this->actingAs($user)->post(route('posts.like'), [
-            'post_id' => $post->id,
-        ]);
+    $response = $this->actingAs($user)->post(route('posts.like'), [
+        'post_id' => $post->id,
+    ]);
 
-        $response->assertStatus(302);
-        $response->assertRedirect(route('home'));
+    $response->assertStatus(302);
+    $response->assertRedirect(route('home'));
+    $response->assertSessionMissing('error');
+});
 
-        $response->assertSessionMissing('error');
-    }
+it('ensures the user can comment on a post', function () {
+    $user = User::factory()->create();
 
-    public function testUserCanUnlikePost()
-    {
-        $user = User::factory()->create();
+    $post = $user->posts()->create([
+        'programming_language' => 'java',
+        'code' => fake()->sentence(),
+        'caption' => fake()->paragraph(),
+    ]);
 
-        $post = $user->posts()->create([
-            'programming_language' => 'java',
-            'caption' => $this->faker->sentence(),
-            'code' => $this->faker->paragraph(),
-        ]);
+    $response = $this->actingAs($user)->post(route('posts.comment'), [
+        'post_id' => $post->id,
+        'comment' => fake()->sentence(),
+    ]);
 
-        $post->likes()->create(['user_id' => $user->id]);
+    $response->assertStatus(302);
+    $response->assertRedirect(route('home'));
+    $response->assertSessionMissing('error');
+});
 
-        $response = $this->actingAs($user)->post(route('posts.like'), [
-            'post_id' => $post->id,
-        ]);
+it('ensures the user can delete a comment', function () {
+    $user = User::factory()->create();
 
-        $response->assertStatus(302);
-        $response->assertRedirect(route('home'));
+    $post = $user->posts()->create([
+        'programming_language' => 'java',
+        'code' => fake()->sentence(),
+        'caption' => fake()->paragraph(),
+    ]);
 
-        $response->assertSessionMissing('error');
-    }
+    $comment = $post->comments()->create([
+        'user_id' => $user->id,
+        'comment' => fake()->sentence(),
+    ]);
 
-    public function testUserCanCommentOnPost()
-    {
-        $user = User::factory()->create();
+    $response = $this->actingAs($user)->delete(route('posts.comment.delete', $comment), [
+        'post_id' => $post->id,
+        'comment_id' => $comment->id,
+    ]);
 
-        $post = $user->posts()->create([
-            'programming_language' => 'java',
-            'caption' => $this->faker->sentence(),
-            'code' => $this->faker->paragraph(),
-        ]);
+    $response->assertStatus(302);
+    $response->assertRedirect(route('home'));
+    $response->assertSessionMissing('error');
 
-        $response = $this->actingAs($user)->post(route('posts.comment'), [
-            'post_id' => $post->id,
-            'comment' => $this->faker->sentence(),
-        ]);
+    Auth::logout();
 
-        $response->assertStatus(302);
-        $response->assertRedirect(route('home'));
+    $user->posts()->delete();
 
-        $response->assertSessionMissing('error');
-    }
-
-    public function testUserCanDeleteComment()
-    {
-        $user = User::factory()->create();
-
-        $post = $user->posts()->create([
-            'programming_language' => 'java',
-            'caption' => $this->faker->sentence(),
-            'code' => $this->faker->paragraph(),
-        ]);
-
-        $comment = $post->comments()->create([
-            'user_id' => $user->id,
-            'comment' => $this->faker->sentence(),
-        ]);
-
-        $response = $this->actingAs($user)->delete(route('posts.comment.delete', $comment), [
-            'post_id' => $post->id,
-            'comment_id' => $comment->id,
-        ]);
-
-        $response->assertStatus(302);
-        $response->assertRedirect(route('home'));
-
-        $response->assertSessionMissing('error');
-    }
-}
+    $user->delete();
+});

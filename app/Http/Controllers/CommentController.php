@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CommentRequest;
 use App\Models\Post;
+use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
@@ -25,7 +26,7 @@ class CommentController extends Controller
         return redirect()->route('home')->with('error', 'Post not found');
     }
 
-    public function deleteComment(CommentRequest $request)
+    public function deleteComment(Request $request)
     {
         $post = Post::find($request->post_id);
 

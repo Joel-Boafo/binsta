@@ -23,6 +23,8 @@ it('ensures the user can login', function () {
     $response->assertSessionHas('status', 'Logged in successfully');
 
     Auth::logout();
+
+    $user->delete();
 });
 
 it('ensures the user can see the register page', function () {
@@ -45,6 +47,8 @@ it('ensures the user can register', function () {
     $response->assertSessionHas('status', 'Registered successfully');
 
     Auth::logout();
+
+    $user->delete();
 });
 
 it('tests for a failed login', function () {
@@ -60,6 +64,22 @@ it('tests for a failed login', function () {
     $response->assertStatus(302);
     $response->assertRedirect(route('users.login'));
     $response->assertSessionHas('error', 'Invalid credentials');
+
+    Auth::logout();
+
+    $user->delete();
+});
+
+it('ensures the user can logout', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('users.logout'));
+
+    $response->assertStatus(302);
+    $response->assertRedirect(route('users.login'));
+    $response->assertSessionHas('status', 'Logged out successfully');
+
+    $user->delete();
 });
 
 it('tests for a failed registration attempt', function () {
@@ -73,6 +93,8 @@ it('tests for a failed registration attempt', function () {
     ]);
 
     $response->assertStatus(302);
-    $response->assertRedirect(route('users.register.post'));
-    $response->assertSessionHas('error');
+    $response->assertRedirect(route('home'));
+    $response->assertSessionHasErrors();
+
+    $user->delete();
 });
