@@ -26,7 +26,7 @@ class CommentController extends Controller
         return redirect()->route('home')->with('error', 'Post not found');
     }
 
-    public function deleteComment(Request $request)
+    public function deleteComment(CommentRequest $request)
     {
         $post = Post::find($request->post_id);
 
