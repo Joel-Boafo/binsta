@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -14,7 +16,7 @@ class PostController extends Controller
         $this->middleware('auth');
     }
 
-    public function show(Post $post)
+    public function show(Post $post): View
     {
         $likes = $post->likes()->pluck('user_id')->toArray();
         $comments = $post->comments()->orderBy('created_at', 'desc')->get();
@@ -22,7 +24,7 @@ class PostController extends Controller
         return view('posts.show', compact('post', 'likes', 'comments'));
     }
 
-    public function feed()
+    public function feed(): View
     {
         $posts = Post::with(['user', 'comments', 'likes'])
             ->orderBy('created_at', 'desc')
@@ -31,13 +33,13 @@ class PostController extends Controller
         return view('welcome', compact('posts'));
     }
 
-    public function create()
+    public function create(): View
     {
         $user = auth()->user();
         return view('posts.create', compact('user'));
     }
 
-    public function createPost(PostRequest $request)
+    public function createPost(PostRequest $request): RedirectResponse
     {
         $request->validated();
 
@@ -52,25 +54,19 @@ class PostController extends Controller
         return redirect()->route('home')->with('status', 'Post created successfully');
     }
 
-    public function edit(Request $request)
+    public function edit(Request $request): void
     {
         $user = auth()->user();
         $post = Post::find($request->post_id);
 
-        if (!$post) {
-            return redirect()->route('home')->with('error', 'Post not found');
-        }
-
-        return view('posts.edit', compact('user', 'post'));
+        !$post ? redirect()->route('home')->with('error', 'Post not found') : view('posts.edit', compact('user', 'post'));
     }
 
-    public function updatePost(Request $request)
+    public function updatePost(Request $request): RedirectResponse
     {
         $post = Post::find(request()->post_id);
 
-        if (!$post) {
-            return redirect()->route('home')->with('error', 'Post not found');
-        }
+        !$post ? redirect()->route('home')->with('error', 'Post not found') : null;
 
         $post->update([
             'caption' => $request->caption,
@@ -81,7 +77,7 @@ class PostController extends Controller
         return redirect()->route('home')->with('status', 'Post updated successfully');
     }
 
-    public function likePost(Request $request)
+    public function likePost(Request $request): RedirectResponse
     {
         $post = Post::find($request->post_id);
 
@@ -100,7 +96,7 @@ class PostController extends Controller
         return redirect()->back()->with('error', 'Post not found');
     }
 
-    public function deletePost(Request $request, Post $post)
+    public function deletePost(Request $request, Post $post): RedirectResponse
     {
         $post = Post::find($request->post_id);
 

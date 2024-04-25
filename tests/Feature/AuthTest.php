@@ -98,3 +98,9 @@ it('tests for a failed registration attempt', function () {
 
     $user->delete();
 });
+
+it('ensures unauthorized users cannot access the homepage', function () {
+    $response = $this->get(route('home'));
+    $response->assertRedirect(route("users.login"));
+    $response->assertStatus(302);
+});

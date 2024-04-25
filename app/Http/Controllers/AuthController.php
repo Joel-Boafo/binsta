@@ -3,25 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginUserRequest;
-use App\Http\Requests\LogoutUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function login()
+    public function login(): View
     {
         return view('users.login');
     }
 
-    public function register()
+    public function register(): View
     {
         return view('users.register');
     }
 
-    public function loginPost(LoginUserRequest $request)
+    public function loginPost(LoginUserRequest $request): RedirectResponse
     {
         $credentials = $request->validated();
 
@@ -32,7 +34,7 @@ class AuthController extends Controller
         return redirect()->route('users.login')->with('error', 'Invalid credentials');
     }
 
-    public function registerPost(RegisterUserRequest $request)
+    public function registerPost(RegisterUserRequest $request): RedirectResponse
     {
         $existingUser = User::where('username', $request->username)->orWhere('email', $request->email)->first();
 
@@ -57,7 +59,7 @@ class AuthController extends Controller
         return redirect()->route('users.login')->with('status', 'Registered successfully');
     }
 
-    public function logout(LogoutUserRequest $request)
+    public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
 

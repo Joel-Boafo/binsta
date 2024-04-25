@@ -6,36 +6,33 @@ use App\Http\Requests\PasswordRequest;
 use App\Http\Requests\ProfilePictureRequest;
 use App\Http\Requests\ProfileRequest;
 use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-    public function show($username)
+    public function show($username): View
     {
         $user = User::where('username', $username)->first();
 
-        if (!$user) {
-            abort(404, 'User not found');
-        }
+        !$user ? abort(404, 'User not found') : null;
 
         $posts = User::find($user->id)->posts()->orderBy('created_at', 'desc')->get();
 
         return view('profiles.show', compact('user', 'posts'));
     }
 
-    public function edit()
+    public function edit(): View
     {
-        if (auth()->check()) {
-            $user = User::find(auth()->user()->id);
-        } else {
-            dd('You are not logged in');
-        }
+        auth()->check() ? $user = User::find(auth()->user()->id) : null;
 
         return view('profiles.edit', compact('user'));
     }
 
-    public function update(ProfileRequest $request)
+    public function update(ProfileRequest $request): RedirectResponse
     {
         $request->validated();
 
@@ -52,13 +49,13 @@ class ProfileController extends Controller
         return redirect()->route('profiles.edit')->with('status', 'Profile updated successfully');
     }
 
-    public function updateProfilePicture(ProfilePictureRequest $request)
+    public function updateProfilePicture(ProfilePictureRequest $request): RedirectResponse
     {
-        $request->validated('avatar');
+        $request->validated();
 
         $user = User::find(auth()->user()->id);
 
-        if ($request->hasFile('avatar')) {
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             $file = $request->file('avatar');
             $fileName = time() . '-' . $file->getClientOriginalName();
             $file->storeAs('public', $fileName, 'public');
@@ -67,21 +64,17 @@ class ProfileController extends Controller
                 'avatar' => 'public/' . $fileName,
             ]);
         }
-
         return redirect()->route('profiles.edit')->with('status', 'Profile picture updated successfully');
     }
 
-    public function editPassword()
+    public function editPassword(): View
     {
-        if (auth()->check()) {
-            $user = User::find(auth()->user()->id);
-        } else {
-            dd('You are not logged in');
-        }
+        auth()->check() ? $user = User::find(auth()->user()->id) : null;
+        
         return view('profiles.edit-password', compact('user'));
     }
 
-    public function updatePassword(PasswordRequest $request)
+    public function updatePassword(PasswordRequest $request): RedirectResponse
     {
         $request->validated();
 
@@ -97,7 +90,7 @@ class ProfileController extends Controller
         return redirect()->route('users.login')->with('status', 'Password updated successfully');
     }
 
-    public function deleteProfile()
+    public function deleteProfile(): RedirectResponse
     {
         $user = User::find(auth()->user()->id);
 
@@ -106,7 +99,7 @@ class ProfileController extends Controller
         return redirect()->route('users.register')->with('status', 'Profile deleted successfully');
     }
 
-    public function search(Request $request)
+    public function search(Request $request): JsonResponse
     {
         $query = $request->query->get('query');
         $users = User::where('username', 'LIKE', "%{$query}%")

@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CommentRequest;
 use App\Models\Post;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class CommentController extends Controller
 {
-    public function placeComment(CommentRequest $request)
+    public function placeComment(CommentRequest $request): RedirectResponse
     {
         $request->validated();
 
@@ -26,7 +26,7 @@ class CommentController extends Controller
         return redirect()->route('home')->with('error', 'Post not found');
     }
 
-    public function deleteComment(CommentRequest $request)
+    public function deleteComment(CommentRequest $request): RedirectResponse
     {
         $post = Post::find($request->post_id);
 
