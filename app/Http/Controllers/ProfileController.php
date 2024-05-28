@@ -63,6 +63,8 @@ class ProfileController extends Controller
             $user->update([
                 'avatar' => 'public/' . $fileName,
             ]);
+
+            dd($user);
         }
         return redirect()->route('profiles.edit')->with('status', 'Profile picture updated successfully');
     }
